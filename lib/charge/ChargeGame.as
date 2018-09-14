@@ -9,15 +9,15 @@
 	public class ChargeGame extends MovieClip
 	{
 		private var currentStage:MovieClip;
-		private var enemyBase:MovieClip;
-		private var yourBase:MovieClip;
-		private var enemyCounter:Number;
-		private var enemyCounterTotal:Number;
-		private var yourCounter:Number;
-		private var yourCounterTotal:Number;
+		private var redBase:MovieClip;
+		private var blueBase:MovieClip;
+		private var redCounter:Number;
+		private var redCounterTotal:Number;
+		private var blueCounter:Number;
+		private var blueCounterTotal:Number;
 		
-		private var yourGuys:Array;
-		private var enemyGuys:Array;
+		private var blueGuys:Array;
+		private var redGuys:Array;
 		
 		private var guyButton:SimpleButton;
 		private var guy2Button:SimpleButton;
@@ -25,24 +25,24 @@
 		private var yBuffer:Number;
 		private var xBuffer:Number;
 		
-		private var yourScore:Number;
-		private var enemyScore:Number;
+		private var blueScore:Number;
+		private var redScore:Number;
 		
-		private var yourField:TextField;
-		private var enemyField:TextField;
+		private var blueField:TextField;
+		private var redField:TextField;
 		
 		public function ChargeGame ()
 		{
 			yBuffer = 100;
 			xBuffer = 30;
 			
-			yourCounter = 100;
-			enemyCounter = 80;
-			enemyCounterTotal = 100;
-			yourCounterTotal = 80;
+			blueCounter = 100;
+			redCounter = 80;
+			redCounterTotal = 100;
+			blueCounterTotal = 80;
 			
-			yourGuys = new Array();
-			enemyGuys = new Array();
+			blueGuys = new Array();
+			redGuys = new Array();
 			
 			currentStage = new Stage1();
 			guyButton = new Guy1Button();
@@ -54,34 +54,38 @@
 			addChild(guyButton);
 			addChild(guy2Button);
 			
-			yourScore = 0;
-			enemyScore = 0;
+			blueScore = 0;
+			redScore = 0;
 			
-			yourField = new TextField;
-			yourField.width = 200;
-			yourField.text = "Your Score: 0";
-			enemyField = new TextField;
-			enemyField.width = 200;
-			enemyField.text = "Enemy Score: 0";
+			blueField = new TextField;
+			blueField.width = 200;
+			blueField.text = "blue Score: 0";
+			redField = new TextField;
+			redField.width = 200;
+			redField.text = "red Score: 0";
 			
-			yourField.x = guyButton.width + guy2Button.width;
-			enemyField.x = yourField.x + yourField.width;
+			blueField.x = guyButton.width + guy2Button.width;
+			redField.x = blueField.x + blueField.width;
 			
-			addChild(yourField);
-			addChild(enemyField);
+			addChild(blueField);
+			addChild(redField);
 			
 			guyButton.addEventListener(MouseEvent.CLICK, createGuyHandler);
 			guy2Button.addEventListener(MouseEvent.CLICK, createGuy2Handler);
 			
-			yourBase = new Castle();
-			enemyBase = new Castle();
+			blueBase = new Castle();
+			redBase = new Castle();
 			
-			yourBase.y = enemyBase.y = currentStage.playingField.height - yourBase.height - yBuffer;
-			enemyBase.x = currentStage.playingField.width - enemyBase.width - xBuffer;
-			yourBase.x = xBuffer;
+			blueBase.y=512-128;
+			redBase.y=512-128;
+			blueBase.x=128;
+			redBase.x=1024-128;
+			//blueBase.y = redBase.y = currentStage.playingField.height - blueBase.height - yBuffer;
+			//redBase.x = currentStage.playingField.width - redBase.width - xBuffer;
+			//blueBase.x = xBuffer;
 			
-			currentStage.playingField.addChild(yourBase);
-			currentStage.playingField.addChild(enemyBase);
+			currentStage.playingField.addChild(blueBase);
+			currentStage.playingField.addChild(redBase);
 			
 			addEventListener(Event.ENTER_FRAME, update);
 		}
@@ -102,29 +106,29 @@
 			
 			newGuy.setDir(dir);
 			
-			newGuy.y = yourBase.y + yourBase.height - newGuy.height;
+			newGuy.y = blueBase.y + blueBase.height - newGuy.height;
 			
 			if (dir == "Right")
 			{
-				yourCounter = 0;
+				blueCounter = 0;
 				guy2Button.mouseEnabled = guyButton.mouseEnabled = false;
 				guy2Button.alpha = guyButton.alpha = 0.5;
 				
 				newGuy.x = xBuffer + newGuy.width;
 				
-				newGuy.enemies = enemyGuys;
-				newGuy.friends = yourGuys;
+				newGuy.enemies = redGuys;
+				newGuy.friends = blueGuys;
 				
-				yourGuys.push(newGuy);
+				blueGuys.push(newGuy);
 			}
 			else
 			{
 				newGuy.x = currentStage.playingField.width - newGuy.width - xBuffer;
 				
-				newGuy.enemies = yourGuys;
-				newGuy.friends = enemyGuys;
+				newGuy.enemies = blueGuys;
+				newGuy.friends = redGuys;
 				
-				enemyGuys.push(newGuy);
+				redGuys.push(newGuy);
 			}
 			
 			currentStage.playingField.addChild(newGuy);
@@ -132,35 +136,35 @@
 		
 		private function update(evt:Event):void
 		{
-			if (yourCounter < yourCounterTotal)
+			if (blueCounter < blueCounterTotal)
 			{
-				yourCounter++;
+				blueCounter++;
 			}
 			else
 			{
 				guy2Button.mouseEnabled = guyButton.mouseEnabled = true;
 				guy2Button.alpha = guyButton.alpha = 1;
 			}
-			if (enemyCounter < enemyCounterTotal)
+			if (redCounter < redCounterTotal)
 			{
-				enemyCounter++;
+				redCounter++;
 			}
 			else
 			{
-				enemyCounter = -100;
+				redCounter = -100;
 				createGuy("Left", new Guy1());
 			}
 			
-			currentStage.update();
+			//currentStage.update();// we axed that parralax bs, so this isn't needed.
 			
 			var guy:Guy;
 			
-			for each (guy in yourGuys)
+			for each (guy in blueGuys)
 			{
-				if (guy.x > enemyBase.x)
+				if (guy.x > redBase.x)
 				{
-					yourScore++;
-					yourField.text = "Your Score: " + yourScore;
+					blueScore++;
+					blueField.text = "blue Score: " + blueScore;
 					guy.purge();
 				}
 				else
@@ -169,12 +173,12 @@
 				}
 			}
 			
-			for each (guy in enemyGuys)
+			for each (guy in redGuys)
 			{
-				if (guy.x < yourBase.x + yourBase.width)
+				if (guy.x < blueBase.x + blueBase.width)
 				{
-					enemyScore++;
-					enemyField.text = "Enemy Score: " + enemyScore;
+					redScore++;
+					redField.text = "red Score: " + redScore;
 					guy.purge();
 				}
 				else

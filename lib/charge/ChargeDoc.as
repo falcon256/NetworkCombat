@@ -9,7 +9,7 @@
 	{
 		public function ChargeDoc()
 		{
-			stage.scaleMode = StageScaleMode.NO_SCALE;
+			stage.scaleMode = StageScaleMode.EXACT_FIT;
 			
 			createStartMenu();
 		}
