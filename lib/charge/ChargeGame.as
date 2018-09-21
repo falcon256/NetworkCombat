@@ -92,15 +92,15 @@
 		
 		private function createGuyHandler(evt:MouseEvent):void
 		{
-			createGuy("Right", new Guy1());
+			createGuy("Right", new SoldierRobot());
 		}
 		
 		private function createGuy2Handler(evt:MouseEvent):void
 		{
-			createGuy("Right", new Guy2());
+			createGuy("Right", new SoldierRobot());
 		}
 		
-		private function createGuy(dir:String, newGuy:Guy):void
+		private function createGuy(dir:String, newGuy:SoldierRobot):void
 		{
 			trace("guy created! " + dir);
 			
