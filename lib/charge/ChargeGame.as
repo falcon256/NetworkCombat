@@ -16,8 +16,8 @@
 		private var blueCounter:Number;
 		private var blueCounterTotal:Number;
 		
-		private var blueGuys:Array;
-		private var redGuys:Array;
+		private var allSoldiers:Array;
+		
 		
 		private var guyButton:SimpleButton;
 		private var guy2Button:SimpleButton;
@@ -41,8 +41,7 @@
 			redCounterTotal = 100;
 			blueCounterTotal = 80;
 			
-			blueGuys = new Array();
-			redGuys = new Array();
+			allSoldiers = new Array();
 			
 			currentStage = new Stage1();
 			guyButton = new Guy1Button();
@@ -76,10 +75,15 @@
 			blueBase = new Castle();
 			redBase = new Castle();
 			
-			blueBase.y=512-128;
-			redBase.y=512-128;
-			blueBase.x=128;
-			redBase.x=1024-128;
+			blueBase.y=512-56;
+			redBase.y=512-56;
+			blueBase.x=32;
+			redBase.x=1024-32;
+			blueBase.width=64;
+			redBase.width=64;
+			blueBase.height=72;	
+			redBase.height=72;
+			
 			//blueBase.y = redBase.y = currentStage.playingField.height - blueBase.height - yBuffer;
 			//redBase.x = currentStage.playingField.width - redBase.width - xBuffer;
 			//blueBase.x = xBuffer;
@@ -92,21 +96,22 @@
 		
 		private function createGuyHandler(evt:MouseEvent):void
 		{
-			createGuy("Right", new SoldierRobot());
+			createGuy(true, new SoldierRobot());
 		}
 		
 		private function createGuy2Handler(evt:MouseEvent):void
 		{
-			createGuy("Right", new SoldierRobot());
+			createGuy(true, new SoldierRobot());
 		}
 		
-		private function createGuy(dir:String, newGuy:SoldierRobot):void
+		private function createGuy(dir:Boolean, newGuy:SoldierRobot):void
 		{
 			trace("guy created! " + dir);
 			
 			newGuy.setDir(dir);
-			
-			newGuy.y = blueBase.y + blueBase.height - newGuy.height;
+			newGuy.width=10;
+			newGuy.height=16;
+			newGuy.y = blueBase.y + blueBase.height - newGuy.height - 100;
 			
 			if (dir == "Right")
 			{
@@ -116,19 +121,17 @@
 				
 				newGuy.x = xBuffer + newGuy.width;
 				
-				newGuy.enemies = redGuys;
-				newGuy.friends = blueGuys;
+				newGuy.allSoldiers = allSoldiers;
 				
-				blueGuys.push(newGuy);
+				allSoldiers.push(newGuy);
 			}
 			else
 			{
 				newGuy.x = currentStage.playingField.width - newGuy.width - xBuffer;
 				
-				newGuy.enemies = blueGuys;
-				newGuy.friends = redGuys;
+				newGuy.allSoldiers = allSoldiers;
 				
-				redGuys.push(newGuy);
+				allSoldiers.push(newGuy);
 			}
 			
 			currentStage.playingField.addChild(newGuy);
@@ -152,14 +155,19 @@
 			else
 			{
 				redCounter = -100;
-				createGuy("Left", new Guy1());
+				createGuy(false, new SoldierRobot());
 			}
 			
+			var guy:SoldierRobot;
+			for each (guy in allSoldiers)
+			{
+				guy.update();
+			}
 			//currentStage.update();// we axed that parralax bs, so this isn't needed.
+			/*
+			var guy:SoldierRobot;
 			
-			var guy:Guy;
-			
-			for each (guy in blueGuys)
+			for each (SoldierRobot in blueGuys)
 			{
 				if (guy.x > redBase.x)
 				{
@@ -186,6 +194,7 @@
 					guy.update();
 				}
 			}
+			*/
 		}
 		
 		private function pause():void
