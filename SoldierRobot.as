@@ -2,6 +2,7 @@
 	
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import lib.charge.ChargeGame;
 	
 	public class SoldierRobot extends MovieClip {
 		
@@ -10,7 +11,7 @@
 		private var health:Number;
 		private var stopped:Boolean;
 		public  var allSoldiers:Array;
-		
+		public static var chargeGame:ChargeGame;
 		
 		
 		public function SoldierRobot() {
@@ -40,6 +41,11 @@
 				Leg2.gotoAndPlay(5);
 			}
 			}
+			
+			if(chargeGame.getColorSample(this.x,this.y+10))
+				y=y+1
+			else
+				y=y-1;
 		}
 		
 		public function setDir(newDir:Boolean):void

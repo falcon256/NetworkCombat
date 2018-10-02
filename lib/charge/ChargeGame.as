@@ -5,6 +5,8 @@
 	import flash.events.MouseEvent;
 	import flash.events.Event;
 	import flash.text.TextField;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	
 	public class ChargeGame extends MovieClip
 	{
@@ -30,6 +32,9 @@
 		
 		private var blueField:TextField;
 		private var redField:TextField;
+		
+		private var stageBitmapData:BitmapData;
+		private var stageBitmap:Bitmap;
 		
 		public function ChargeGame ()
 		{
@@ -90,7 +95,7 @@
 			
 			currentStage.playingField.addChild(blueBase);
 			currentStage.playingField.addChild(redBase);
-			
+			SoldierRobot.chargeGame=this;
 			addEventListener(Event.ENTER_FRAME, update);
 		}
 		
@@ -107,7 +112,6 @@
 		private function createGuy(dir:Boolean, newGuy:SoldierRobot):void
 		{
 			trace("guy created! " + dir);
-			
 			newGuy.setDir(dir);
 			newGuy.width=10;
 			newGuy.height=16;
@@ -139,6 +143,11 @@
 		
 		private function update(evt:Event):void
 		{
+			//grab our stage for per-pixel collision detection.
+			var stageBitmapData:BitmapData = new BitmapData(stage.width, stage.height);
+			stageBitmapData.draw(stage);
+			var stageBitmap:Bitmap = new Bitmap(stageBitmapData);
+			
 			if (blueCounter < blueCounterTotal)
 			{
 				blueCounter++;
@@ -195,6 +204,22 @@
 				}
 			}
 			*/
+		}
+		
+		//slashdot is helpful, this is heavily modified though.
+		public function getColorSample(x:int, y:int):Boolean {			
+			//trace(b.bitmapData.getPixel(x,y));
+			if(stageBitmap!=null&&stageBitmap.bitmapData!=null)
+			{
+				var rgb:uint = stageBitmap.bitmapData.getPixel(x,y);
+				var red:int =  (rgb >> 16 & 0xff);
+				var green:int =  (rgb >> 8 & 0xff);
+				var blue:int =  (rgb & 0xff);
+				
+				if(red>200&&green>200&&blue>200)
+					return false;
+			}
+			return true;
 		}
 		
 		private function pause():void

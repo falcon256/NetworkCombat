@@ -5,6 +5,7 @@
 	
 	public class Stage1 extends MovieClip {
 		
+			
 		
 		public function Stage1() {
 			
