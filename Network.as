@@ -2,9 +2,10 @@
 	import Neuron;
 	public class Network {
 
-		var allNodes:Array;
-		var score:Number;
+		private var allNodes:Array;
+		public var score:Number;
 		public function Network(layers:int, nodes:int) {
+			score=0;
 			allNodes = new Array();
 			var layerN:int;
 			var nodeN:int;

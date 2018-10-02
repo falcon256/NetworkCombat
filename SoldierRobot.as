@@ -10,12 +10,18 @@
 		private var direction:Boolean;
 		private var health:Number;
 		private var stopped:Boolean;
-		public  var allSoldiers:Array;
+		private var maxLifeTime:Number;
+		private var age:Number;
+		//public  var allSoldiers:Array;
 		public static var chargeGame:ChargeGame;
+		public var brain:Network;
 		
 		
-		public function SoldierRobot() {
-			allSoldiers = new Array();
+		public function SoldierRobot(br:Network) {
+			brain = br;
+			age = 0;
+			maxLifeTime = chargeGame.currentMaxLifeTime;
+			//allSoldiers = new Array();
 			startWalk();
 		}
 		
@@ -28,7 +34,11 @@
 		
 		public function update():void
 		{
-			
+			if(brain==null)
+			{
+				trace("This guy has no brain!!!!!!");
+				return;
+			}
 			if(!stopped)
 			{
 			if(Leg1.currentFrame>23)
@@ -42,10 +52,76 @@
 			}
 			}
 			
-			if(chargeGame.getColorSample(this.x,this.y+10))
-				y=y+1
+			var isGrounded:Boolean = false;
+			if(chargeGame.getColorSample(this.x,this.y+96))
+			{
+				y--;
+				isGrounded=true;
+			}
 			else
-				y=y-1;
+			{
+				y++;
+				isGrounded=false;
+			}
+			//this was just for testing.
+			//brain = brain.mutateAndReturnNewNetwork(0.1,0.01,0.01);
+			
+			brain.setSingleInput(0,x/1024);
+			brain.setSingleInput(1,(isGrounded)?1:0);
+			brain.tickNetwork();
+			var leftBias:Number = brain.getSingleOutput(0);
+			var rightBias:Number = brain.getSingleOutput(1);
+			var shootBias:Number = brain.getSingleOutput(2);
+			var aimAngle:Number = brain.getSingleOutput(3)*90;
+			var crouchBias:Number = brain.getSingleOutput(4);
+			var normTotal:Number = Math.sqrt(leftBias*leftBias + rightBias*rightBias + shootBias*shootBias + crouchBias*crouchBias);
+			
+			leftBias/=normTotal+0.00001;
+			rightBias/=normTotal+0.00001;
+			shootBias/=normTotal+0.00001;
+			crouchBias/=normTotal+0.00001;
+			
+			trace(leftBias+" "+rightBias);
+			if(leftBias>0.9)
+			{
+				x+=0.5;
+			}
+			else if(rightBias>0.9)
+			{
+				x-=0.5;
+			}
+			else if(shootBias>0.9)
+			{
+				
+			}
+			else if(crouchBias>0.9)
+			{
+				
+			}
+			trace(age+" "+maxLifeTime);
+			if(age++>maxLifeTime)
+				killMeAndSaveMyBrain();
+			
+		}
+		
+		public function killMeAndSaveMyBrain():void
+		{
+			trace("Killing...");
+			var score:Number = x;	
+			if(amIRed)
+			{
+				brain.score=score;
+				chargeGame.addRedNetwork(brain);
+				this.parent.removeChild(this);
+				chargeGame.allSoldiers.removeAt(chargeGame.allSoldiers.indexOf(this));
+			}
+			else
+			{	
+				brain.score=score;
+				chargeGame.addBlueNetwork(brain);
+				this.parent.removeChild(this);
+				chargeGame.allSoldiers.removeAt(chargeGame.allSoldiers.indexOf(this));
+			}
 		}
 		
 		public function setDir(newDir:Boolean):void

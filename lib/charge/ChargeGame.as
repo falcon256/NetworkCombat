@@ -18,35 +18,43 @@
 		private var blueCounter:Number;
 		private var blueCounterTotal:Number;
 		
-		private var allSoldiers:Array;
-		
-		
 		private var guyButton:SimpleButton;
-		private var guy2Button:SimpleButton;
-		
+		private var guy2Button:SimpleButton;		
 		private var yBuffer:Number;
-		private var xBuffer:Number;
-		
+		private var xBuffer:Number;		
 		private var blueScore:Number;
-		private var redScore:Number;
-		
+		private var redScore:Number;		
 		private var blueField:TextField;
-		private var redField:TextField;
-		
+		private var redField:TextField;		
 		private var stageBitmapData:BitmapData;
 		private var stageBitmap:Bitmap;
+		
+		private var maxLifeTime:Number;
+		
+		private var blueNetworks:Array;
+		private var redNetworks:Array;
+		
+		public var allSoldiers:Array;
+		public var currentMaxLifeTime:Number;
 		
 		public function ChargeGame ()
 		{
 			yBuffer = 100;
 			xBuffer = 30;
-			
+			maxLifeTime=1000;
+			currentMaxLifeTime=1;
 			blueCounter = 100;
 			redCounter = 80;
 			redCounterTotal = 100;
 			blueCounterTotal = 80;
 			
 			allSoldiers = new Array();
+			blueNetworks = new Array();
+			redNetworks = new Array();
+			
+			//debug code
+			blueNetworks.push(new Network(5,5));
+			redNetworks.push(new Network(5,5));
 			
 			currentStage = new Stage1();
 			guyButton = new Guy1Button();
@@ -101,12 +109,12 @@
 		
 		private function createGuyHandler(evt:MouseEvent):void
 		{
-			createGuy(true, new SoldierRobot());
+			//createGuy(true, new SoldierRobot());
 		}
 		
 		private function createGuy2Handler(evt:MouseEvent):void
 		{
-			createGuy(true, new SoldierRobot());
+			//createGuy(true, new SoldierRobot());
 		}
 		
 		private function createGuy(dir:Boolean, newGuy:SoldierRobot):void
@@ -125,7 +133,7 @@
 				
 				newGuy.x = xBuffer + newGuy.width;
 				
-				newGuy.allSoldiers = allSoldiers;
+				//newGuy.allSoldiers = allSoldiers;
 				
 				allSoldiers.push(newGuy);
 			}
@@ -133,7 +141,7 @@
 			{
 				newGuy.x = currentStage.playingField.width - newGuy.width - xBuffer;
 				
-				newGuy.allSoldiers = allSoldiers;
+				//newGuy.allSoldiers = allSoldiers;
 				
 				allSoldiers.push(newGuy);
 			}
@@ -143,10 +151,18 @@
 		
 		private function update(evt:Event):void
 		{
+			currentMaxLifeTime = Math.min(maxLifeTime,currentMaxLifeTime+0.1);
+			
+			var guy:SoldierRobot;
+			for each (guy in allSoldiers)
+			{
+				guy.visible=false;
+				guy.update();
+			}
 			//grab our stage for per-pixel collision detection.
-			var stageBitmapData:BitmapData = new BitmapData(stage.width, stage.height);
-			stageBitmapData.draw(stage);
-			var stageBitmap:Bitmap = new Bitmap(stageBitmapData);
+			stageBitmapData = new BitmapData(currentStage.width, currentStage.height);
+			stageBitmapData.draw(currentStage);
+			stageBitmap = new Bitmap(stageBitmapData);
 			
 			if (blueCounter < blueCounterTotal)
 			{
@@ -159,17 +175,18 @@
 			}
 			if (redCounter < redCounterTotal)
 			{
-				redCounter++;
+				redCounter+=100;
 			}
 			else
 			{
 				redCounter = -100;
-				createGuy(false, new SoldierRobot());
+				createGuy(false, new SoldierRobot(getBestRedNetwork().mutateAndReturnNewNetwork(0.1,0.01,0.01)));
 			}
 			
-			var guy:SoldierRobot;
+			
 			for each (guy in allSoldiers)
 			{
+				guy.visible=true;
 				guy.update();
 			}
 			//currentStage.update();// we axed that parralax bs, so this isn't needed.
@@ -215,11 +232,73 @@
 				var red:int =  (rgb >> 16 & 0xff);
 				var green:int =  (rgb >> 8 & 0xff);
 				var blue:int =  (rgb & 0xff);
-				
+				//trace(blue);
 				if(red>200&&green>200&&blue>200)
 					return false;
 			}
 			return true;
+		}
+		
+		public function getBestRedNetwork():Network
+		{
+			var net:Network=null;
+			var best:Network = null;
+			var bestScore:Number = -1;
+			for each (net in redNetworks)
+			{
+				if(net.score>bestScore)
+				{
+					bestScore=net.score;
+					best=net;
+				}				
+			}
+			return best;
+		}
+		
+		public function getBestBlueNetwork():Network
+		{
+			var net:Network=null;
+			var best:Network = null;
+			var bestScore:Number = -1;
+			for each (net in blueNetworks)
+			{
+				if(net.score>bestScore)
+				{
+					bestScore=net.score;
+					best=net;
+				}				
+			}
+			return best;
+		}
+		
+		public function trimNetworkLists()
+		{
+			if(redNetworks.length>100)
+			{
+				//remove worst
+				var net:Network;
+				var low:Number = 10000000;
+				var worse:Network = null;
+				for(net in redNetworks)
+				{
+					if(net.score<low)
+					{
+						worse = net;
+						low = worse.score;
+					}
+				}
+				redNetworks.removeAt(redNetworks.indexOf(worse));
+			}
+		}
+		
+		public function addRedNetwork(net:Network)
+		{
+			redNetworks.push(net);
+		}
+		
+		public function addBlueNetwork(net:Network)
+		{
+			blueNetworks.push(net);
 		}
 		
 		private function pause():void
