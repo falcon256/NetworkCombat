@@ -1,5 +1,10 @@
 ﻿package lib.charge
 {
+	
+		//TODO-BUG- Troubleshoot why the spawn point changes on the red side.
+	
+	
+	
 	import flash.display.MovieClip;
 	import flash.display.SimpleButton;
 	import flash.events.MouseEvent;
@@ -7,16 +12,18 @@
 	import flash.text.TextField;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.geom.ColorTransform;
 	
 	public class ChargeGame extends MovieClip
 	{
+		
+		public static var chargeGame:ChargeGame;
 		private var currentStage:MovieClip;
 		private var redBase:MovieClip;
 		private var blueBase:MovieClip;
-		private var redCounter:Number;
-		private var redCounterTotal:Number;
-		private var blueCounter:Number;
-		private var blueCounterTotal:Number;
+		
+		private var spawnTimerAccumulator:Number;
+		private var spawnTimerMaximum:Number;
 		
 		private var guyButton:SimpleButton;
 		private var guy2Button:SimpleButton;		
@@ -39,14 +46,15 @@
 		
 		public function ChargeGame ()
 		{
+			chargeGame=this;
+		
+			spawnTimerAccumulator=0;
+			spawnTimerMaximum = 10;
 			yBuffer = 100;
 			xBuffer = 30;
 			maxLifeTime=1000;
-			currentMaxLifeTime=1;
-			blueCounter = 100;
-			redCounter = 80;
-			redCounterTotal = 100;
-			blueCounterTotal = 80;
+			currentMaxLifeTime=100;
+			
 			
 			allSoldiers = new Array();
 			blueNetworks = new Array();
@@ -124,25 +132,22 @@
 			newGuy.width=10;
 			newGuy.height=16;
 			newGuy.y = blueBase.y + blueBase.height - newGuy.height - 100;
-			
-			if (dir == "Right")
+			var myColorTransform = new ColorTransform();
+			if (dir == false)
 			{
-				blueCounter = 0;
-				guy2Button.mouseEnabled = guyButton.mouseEnabled = false;
-				guy2Button.alpha = guyButton.alpha = 0.5;
 				
-				newGuy.x = xBuffer + newGuy.width;
+				newGuy.x = newGuy.width;
 				
-				//newGuy.allSoldiers = allSoldiers;
-				
+				myColorTransform.color = 0x8080A0;
+				newGuy.transform.colorTransform = myColorTransform;
 				allSoldiers.push(newGuy);
 			}
 			else
 			{
-				newGuy.x = currentStage.playingField.width - newGuy.width - xBuffer;
+				newGuy.x = currentStage.playingField.width - newGuy.width;
 				
-				//newGuy.allSoldiers = allSoldiers;
-				
+				myColorTransform.color = 0xA08080;
+				newGuy.transform.colorTransform = myColorTransform;
 				allSoldiers.push(newGuy);
 			}
 			
@@ -152,7 +157,7 @@
 		private function update(evt:Event):void
 		{
 			currentMaxLifeTime = Math.min(maxLifeTime,currentMaxLifeTime+0.1);
-			
+			spawnTimerAccumulator++;
 			var guy:SoldierRobot;
 			for each (guy in allSoldiers)
 			{
@@ -164,23 +169,12 @@
 			stageBitmapData.draw(currentStage);
 			stageBitmap = new Bitmap(stageBitmapData);
 			
-			if (blueCounter < blueCounterTotal)
+
+			if (spawnTimerAccumulator++ > spawnTimerMaximum)
 			{
-				blueCounter++;
-			}
-			else
-			{
-				guy2Button.mouseEnabled = guyButton.mouseEnabled = true;
-				guy2Button.alpha = guyButton.alpha = 1;
-			}
-			if (redCounter < redCounterTotal)
-			{
-				redCounter+=100;
-			}
-			else
-			{
-				redCounter = -100;
+				spawnTimerAccumulator=0;
 				createGuy(false, new SoldierRobot(getBestRedNetwork().mutateAndReturnNewNetwork(0.1,0.01,0.01)));
+				createGuy(true, new SoldierRobot(getBestBlueNetwork().mutateAndReturnNewNetwork(0.1,0.01,0.01)));
 			}
 			
 			
@@ -189,38 +183,8 @@
 				guy.visible=true;
 				guy.update();
 			}
-			//currentStage.update();// we axed that parralax bs, so this isn't needed.
-			/*
-			var guy:SoldierRobot;
-			
-			for each (SoldierRobot in blueGuys)
-			{
-				if (guy.x > redBase.x)
-				{
-					blueScore++;
-					blueField.text = "blue Score: " + blueScore;
-					guy.purge();
-				}
-				else
-				{
-					guy.update();
-				}
-			}
-			
-			for each (guy in redGuys)
-			{
-				if (guy.x < blueBase.x + blueBase.width)
-				{
-					redScore++;
-					redField.text = "red Score: " + redScore;
-					guy.purge();
-				}
-				else
-				{
-					guy.update();
-				}
-			}
-			*/
+	
+			trimNetworkLists();
 		}
 		
 		//slashdot is helpful, this is heavily modified though.
@@ -276,10 +240,10 @@
 			if(redNetworks.length>100)
 			{
 				//remove worst
-				var net:Network;
+				var net:Network = null;
 				var low:Number = 10000000;
 				var worse:Network = null;
-				for(net in redNetworks)
+				for each(net in redNetworks)
 				{
 					if(net.score<low)
 					{
@@ -288,6 +252,21 @@
 					}
 				}
 				redNetworks.removeAt(redNetworks.indexOf(worse));
+				
+				var oldNet:Network = net;
+				//net:Network = null;
+				low = 10000000;
+				//worse:Network = null;
+				for each(net in blueNetworks)
+				{
+					if(net.score<low)
+					{
+						worse = net;
+						low = worse.score;
+					}
+				}
+				if(oldNet!=net)
+					blueNetworks.removeAt(blueNetworks.indexOf(worse));
 			}
 		}
 		
@@ -299,6 +278,18 @@
 		public function addBlueNetwork(net:Network)
 		{
 			blueNetworks.push(net);
+		}
+		
+		public function  getDistanceRatioFromBlueBase(xa:Number, ya:Number):Number
+		{
+			var xd:Number = Math.abs(xa-blueBase.x);
+			return xd/stage.width;
+		}
+		
+		public function  getDistanceRatioFromRedBase(xa:Number, ya:Number):Number
+		{
+			var xd:Number = Math.abs(xa-redBase.x);
+			return xd/stage.width;
 		}
 		
 		private function pause():void
@@ -314,6 +305,63 @@
 		private function endGame():void
 		{
 			
+		}
+		
+		
+		
+		//network input queries
+		public function getAlliesNearbyClose(xa:Number, red:Boolean):Number
+		{
+			var near:Number=0;
+			var guy:SoldierRobot;
+			for each (guy in allSoldiers)
+			{
+				if(guy.amIRed==red)
+				{
+					var xd:Number = Math.abs(guy.x-xa)
+					if( xd < 64 )
+					{
+						near+=0.1;
+					}
+				}
+			}
+			return Math.min(near,1.0);
+		}
+		
+		public function getAlliesNearby(xa:Number, red:Boolean):Number
+		{
+			var near:Number=0;
+			var guy:SoldierRobot;
+			for each (guy in allSoldiers)
+			{
+				if(guy.amIRed==red)
+				{
+					var xd:Number = Math.abs(guy.x-xa)
+					if( xd < 128 )
+					{
+						near+=0.1;
+					}
+				}
+			}
+			return Math.min(near,1.0);
+		}
+		
+		public function getAlliesNearbyFar(xa:Number, red:Boolean):Number
+		{
+			var near:Number=0;
+			var guy:SoldierRobot;
+			for each (guy in allSoldiers)
+			{
+				if(guy.amIRed==red)
+				{
+					var xd:Number = Math.abs(guy.x-xa)
+					if( xd < 256 )
+					{
+						near+=0.1;
+					}
+				}
+			}
+			return Math.min(near,1.0);
 		}
 	}
 }

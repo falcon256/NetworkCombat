@@ -3,10 +3,14 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import lib.charge.ChargeGame;
-	
+
 	public class SoldierRobot extends MovieClip {
 		
-		private var amIRed:Boolean;
+		public var amIRed:Boolean;
+		public var amICrouched:Boolean;
+		
+		public var facingLeft:Boolean;
+		
 		private var direction:Boolean;
 		private var health:Number;
 		private var stopped:Boolean;
@@ -23,6 +27,7 @@
 			maxLifeTime = chargeGame.currentMaxLifeTime;
 			//allSoldiers = new Array();
 			startWalk();
+			amIRed = direction;
 		}
 		
 		public function startWalk()
@@ -66,7 +71,7 @@
 			//this was just for testing.
 			//brain = brain.mutateAndReturnNewNetwork(0.1,0.01,0.01);
 			
-			brain.setSingleInput(0,x/1024);
+			brain.setSingleInput(0,chargeGame.getAlliesNearbyClose();//left off here TODO
 			brain.setSingleInput(1,(isGrounded)?1:0);
 			brain.tickNetwork();
 			var leftBias:Number = brain.getSingleOutput(0);
@@ -99,25 +104,33 @@
 				
 			}
 			trace(age+" "+maxLifeTime);
-			if(age++>maxLifeTime)
+			if(age++>maxLifeTime||y>chargeGame.stage.height)
 				killMeAndSaveMyBrain();
+			
+			
+			if(x<1)
+				x=1;
+			if(x>chargeGame.stage.width-1)
+				x=chargeGame.stage.width;
+			
+			
 			
 		}
 		
 		public function killMeAndSaveMyBrain():void
 		{
 			trace("Killing...");
-			var score:Number = x;	
+			var score:Number = x;
 			if(amIRed)
 			{
-				brain.score=score;
+				brain.score=score=1.0-chargeGame.getDistanceRatioFromBlueBase(x,y);
 				chargeGame.addRedNetwork(brain);
 				this.parent.removeChild(this);
 				chargeGame.allSoldiers.removeAt(chargeGame.allSoldiers.indexOf(this));
 			}
 			else
 			{	
-				brain.score=score;
+				brain.score=score=1.0-chargeGame.getDistanceRatioFromRedBase(x,y);
 				chargeGame.addBlueNetwork(brain);
 				this.parent.removeChild(this);
 				chargeGame.allSoldiers.removeAt(chargeGame.allSoldiers.indexOf(this));
