@@ -18,7 +18,7 @@
 		private var age:Number;
 		//public  var allSoldiers:Array;
 		public static var chargeGame:ChargeGame;
-		public var brain:Network;//Some code
+		public var brain:Network;
 		
 		
 		public function SoldierRobot(br:Network,red) {
@@ -56,9 +56,13 @@
 				Leg2.gotoAndPlay(5);
 			}
 			}
-			
+			if(facingLeft)
+				this.scaleX=-0.1;
+			else
+				this.scaleX=0.1;
 			var isGrounded:Boolean = false;
-			if(chargeGame.getColorSample(this.x,this.y+96))
+			var crouchOffset = (amICrouched)?5:0;
+			if(chargeGame.getColorSample(this.x,this.y+96-crouchOffset))
 			{
 				y--;
 				isGrounded=true;
@@ -88,15 +92,25 @@
 			rightBias/=normTotal+0.00001;
 			shootBias/=normTotal+0.00001;
 			crouchBias/=normTotal+0.00001;
-			
+			amICrouched=false;
 			//trace(leftBias+" "+rightBias);
 			if(leftBias>0.5)
 			{
-				x+=0.5;
+				if(isGrounded)
+				{
+					x+=0.5;
+					startWalk();
+				}
+				facingLeft = true;
 			}
 			else if(rightBias>0.5)
 			{
-				x-=0.5;
+				if(isGrounded)
+				{
+					x-=0.5;
+					startWalk();
+				}
+				facingLeft = false;
 			}
 			else if(shootBias>0.5)
 			{
@@ -104,8 +118,12 @@
 			}
 			else if(crouchBias>0.5)
 			{
-				
+				Leg1.gotoAndStop(28);
+				Leg2.gotoAndStop(28);
+				amICrouched=true;
+				stopped=true;
 			}
+			this.Gun.rotation = aimAngle;
 			//trace(age+" "+maxLifeTime);
 			if(age++>maxLifeTime||y>chargeGame.stage.height)
 				killMeAndSaveMyBrain();
