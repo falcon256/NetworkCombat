@@ -18,7 +18,7 @@
 		private var age:Number;
 		//public  var allSoldiers:Array;
 		public static var chargeGame:ChargeGame;
-		public var brain:Network;
+		public var brain:Network;//Some code
 		
 		
 		public function SoldierRobot(br:Network,red) {
