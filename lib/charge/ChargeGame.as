@@ -49,11 +49,11 @@
 			chargeGame=this;
 		
 			spawnTimerAccumulator=0;
-			spawnTimerMaximum = 10;
+			spawnTimerMaximum = 1000;
 			yBuffer = 100;
 			xBuffer = 30;
-			maxLifeTime=1000;
-			currentMaxLifeTime=100;
+			maxLifeTime=1000000;
+			currentMaxLifeTime=1000;
 			
 			
 			allSoldiers = new Array();
@@ -61,8 +61,8 @@
 			redNetworks = new Array();
 			
 			//debug code
-			blueNetworks.push(new Network(5,5));
-			redNetworks.push(new Network(5,5));
+			blueNetworks.push(new Network(2,10));
+			redNetworks.push(new Network(2,10));
 			
 			currentStage = new Stage1();
 			guyButton = new Guy1Button();
@@ -127,7 +127,7 @@
 		
 		private function createGuy(dir:Boolean, newGuy:SoldierRobot):void
 		{
-			trace("guy created! " + dir);
+			//trace("guy created! " + dir);
 			newGuy.setDir(dir);
 			newGuy.width=10;
 			newGuy.height=16;
@@ -138,7 +138,7 @@
 				
 				newGuy.x = newGuy.width;
 				
-				myColorTransform.color = 0x8080A0;
+				myColorTransform.color = 0x808080;
 				newGuy.transform.colorTransform = myColorTransform;
 				allSoldiers.push(newGuy);
 			}
@@ -170,11 +170,12 @@
 			stageBitmap = new Bitmap(stageBitmapData);
 			
 
-			if (spawnTimerAccumulator++ > spawnTimerMaximum)
+			if (spawnTimerAccumulator++ > spawnTimerMaximum/stage.frameRate)
 			{
 				spawnTimerAccumulator=0;
-				createGuy(false, new SoldierRobot(getBestRedNetwork().mutateAndReturnNewNetwork(0.1,0.01,0.01)));
-				createGuy(true, new SoldierRobot(getBestBlueNetwork().mutateAndReturnNewNetwork(0.1,0.01,0.01)));
+				createGuy(false, new SoldierRobot(getBestBlueNetwork().mutateAndReturnNewNetwork(0.5,0.01,0.01),false));
+				createGuy(true, new SoldierRobot(getBestRedNetwork().mutateAndReturnNewNetwork(0.5,0.1,0.1),true));
+				trace(currentStage.playingField.numChildren);
 			}
 			
 			
@@ -216,6 +217,7 @@
 					best=net;
 				}				
 			}
+			trace("Red:"+best.score+" "+redNetworks.length)
 			return best;
 		}
 		
@@ -232,6 +234,7 @@
 					best=net;
 				}				
 			}
+			trace("Blue:"+best.score+" "+blueNetworks.length)
 			return best;
 		}
 		
@@ -252,7 +255,10 @@
 					}
 				}
 				redNetworks.removeAt(redNetworks.indexOf(worse));
-				
+			}
+			
+			if(blueNetworks.length>100)
+			{
 				var oldNet:Network = net;
 				//net:Network = null;
 				low = 10000000;
@@ -262,6 +268,7 @@
 					if(net.score<low)
 					{
 						worse = net;
+						oldNet = worse;
 						low = worse.score;
 					}
 				}
@@ -282,14 +289,16 @@
 		
 		public function  getDistanceRatioFromBlueBase(xa:Number, ya:Number):Number
 		{
-			var xd:Number = Math.abs(xa-blueBase.x);
-			return xd/stage.width;
+			return stage.width-Math.abs(xa-blueBase.x);
+			//var xd:Number = Math.abs(xa-blueBase.x);
+			//return xd/stage.width;
 		}
 		
 		public function  getDistanceRatioFromRedBase(xa:Number, ya:Number):Number
 		{
-			var xd:Number = Math.abs(xa-redBase.x);
-			return xd/stage.width;
+			return stage.width-Math.abs(xa-redBase.x);
+			//var xd:Number = Math.abs(xa-redBase.x);
+			//return xd/stage.width;
 		}
 		
 		private function pause():void

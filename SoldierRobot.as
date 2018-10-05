@@ -21,13 +21,13 @@
 		public var brain:Network;
 		
 		
-		public function SoldierRobot(br:Network) {
+		public function SoldierRobot(br:Network,red) {
 			brain = br;
 			age = 0;
 			maxLifeTime = chargeGame.currentMaxLifeTime;
 			//allSoldiers = new Array();
 			startWalk();
-			amIRed = direction;
+			direction = amIRed = red;
 		}
 		
 		public function startWalk()
@@ -71,8 +71,11 @@
 			//this was just for testing.
 			//brain = brain.mutateAndReturnNewNetwork(0.1,0.01,0.01);
 			
-			brain.setSingleInput(0,chargeGame.getAlliesNearbyClose();//left off here TODO
-			brain.setSingleInput(1,(isGrounded)?1:0);
+			
+			brain.setSingleInput(0,(isGrounded)?1:0);
+			brain.setSingleInput(1,chargeGame.getAlliesNearbyClose(x,amIRed));
+			brain.setSingleInput(2,chargeGame.getAlliesNearby(x,amIRed));
+			brain.setSingleInput(3,chargeGame.getAlliesNearbyFar(x,amIRed));
 			brain.tickNetwork();
 			var leftBias:Number = brain.getSingleOutput(0);
 			var rightBias:Number = brain.getSingleOutput(1);
@@ -86,32 +89,32 @@
 			shootBias/=normTotal+0.00001;
 			crouchBias/=normTotal+0.00001;
 			
-			trace(leftBias+" "+rightBias);
-			if(leftBias>0.9)
+			//trace(leftBias+" "+rightBias);
+			if(leftBias>0.5)
 			{
 				x+=0.5;
 			}
-			else if(rightBias>0.9)
+			else if(rightBias>0.5)
 			{
 				x-=0.5;
 			}
-			else if(shootBias>0.9)
+			else if(shootBias>0.5)
 			{
 				
 			}
-			else if(crouchBias>0.9)
+			else if(crouchBias>0.5)
 			{
 				
 			}
-			trace(age+" "+maxLifeTime);
+			//trace(age+" "+maxLifeTime);
 			if(age++>maxLifeTime||y>chargeGame.stage.height)
 				killMeAndSaveMyBrain();
 			
 			
-			if(x<1)
-				x=1;
-			if(x>chargeGame.stage.width-1)
-				x=chargeGame.stage.width;
+			if(x<1+width)
+				x=1+width;
+			if(x>chargeGame.stage.width-width)
+				x=chargeGame.stage.width-width;
 			
 			
 			
@@ -119,21 +122,22 @@
 		
 		public function killMeAndSaveMyBrain():void
 		{
-			trace("Killing...");
+			//trace("Killing...");
 			var score:Number = x;
 			if(amIRed)
 			{
-				brain.score=score=1.0-chargeGame.getDistanceRatioFromBlueBase(x,y);
-				chargeGame.addRedNetwork(brain);
-				this.parent.removeChild(this);
-				chargeGame.allSoldiers.removeAt(chargeGame.allSoldiers.indexOf(this));
+				brain.score=score=chargeGame.getDistanceRatioFromBlueBase(x,y);
+				chargeGame.addRedNetwork(brain);				
+				this.parent.removeChild(this);				
+				chargeGame.allSoldiers.splice(chargeGame.allSoldiers.indexOf(this),1);
+				
 			}
 			else
 			{	
-				brain.score=score=1.0-chargeGame.getDistanceRatioFromRedBase(x,y);
-				chargeGame.addBlueNetwork(brain);
+				brain.score=score=chargeGame.getDistanceRatioFromRedBase(x,y);
+				chargeGame.addBlueNetwork(brain);				
 				this.parent.removeChild(this);
-				chargeGame.allSoldiers.removeAt(chargeGame.allSoldiers.indexOf(this));
+				chargeGame.allSoldiers.splice(chargeGame.allSoldiers.indexOf(this),1);
 			}
 		}
 		

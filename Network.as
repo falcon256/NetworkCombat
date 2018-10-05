@@ -42,9 +42,9 @@
 		
 		public function tickNetwork():void
 		{
-			for(var x:Number = 0; x < 5; x++)
+			for(var x:Number = 0; x < allNodes.length; x++)
 			{
-				for(var y:Number = 0; y < 5; y++)
+				for(var y:Number = 0; y < allNodes[x].length; y++)
 				{	
 					var ne:Neuron = allNodes[x][y];
 					ne.Tick();
@@ -67,7 +67,7 @@
 					
 					var n1:Neuron = allNodes[layerN][nodeN];
 					var n2:Neuron = newNet.allNodes[layerN][nodeN];
-					trace(layerN+" "+nodeN+" "+n2.childNeurons.length);
+					//trace(layerN+" "+nodeN+" "+n2.childNeurons.length);
 					for(nodeX = 0; nodeX < layer.length; nodeX++)
 					{
 						
