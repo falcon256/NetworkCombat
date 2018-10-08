@@ -8,7 +8,7 @@
 		
 		public var amIRed:Boolean;
 		public var amICrouched:Boolean;
-		
+		public var amIFalling:Boolean;
 		public var facingLeft:Boolean;
 		
 		private var direction:Boolean;
@@ -28,6 +28,7 @@
 			//allSoldiers = new Array();
 			startWalk();
 			direction = amIRed = red;
+			amIFalling=true;
 		}
 		
 		public function startWalk()
@@ -66,11 +67,16 @@
 			{
 				y--;
 				isGrounded=true;
+				amIFalling=false;
 			}
 			else
 			{
 				y++;
 				isGrounded=false;
+				if(chargeGame.getColorSample(this.x,this.y+97-crouchOffset))
+				{
+					amIFalling=true;
+				}
 			}
 			//this was just for testing.
 			//brain = brain.mutateAndReturnNewNetwork(0.1,0.01,0.01);
@@ -99,7 +105,8 @@
 				if(isGrounded)
 				{
 					x+=0.5;
-					startWalk();
+					Leg1.play();
+					Leg2.play();
 				}
 				facingLeft = true;
 			}
@@ -108,7 +115,8 @@
 				if(isGrounded)
 				{
 					x-=0.5;
-					startWalk();
+					Leg1.play();
+					Leg2.play();
 				}
 				facingLeft = false;
 			}

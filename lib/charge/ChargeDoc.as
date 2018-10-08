@@ -35,7 +35,6 @@
 		private function createGame():void
 		{
 			var game:ChargeGame = new ChargeGame();
-			
 			addChild(game);
 		}
 	}
