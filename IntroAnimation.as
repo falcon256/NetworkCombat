@@ -9,15 +9,15 @@
 		
 		private var currentNetwork:Network;
 		private var lastNetwork:Network;
-		private var inputTestString:String = "TEST@INPUT@";
-		private var outputTestString:String = "TEST@OUTPUT";
+		private var inputTestString:String =  "TEST@INPUT@@@@@@";
+		private var outputTestString:String = "TEST@OUTPUT@GOOD";
 		private var trainingSpeed:Number = 1;
 		public function IntroAnimation() 
 		{
 			trace("intro starting");
 			
-			currentNetwork = new Network(6,10);
-			lastNetwork = new Network(6,10);
+			currentNetwork = new Network(6,16);
+			lastNetwork = new Network(6,16);
 			
 			for(var i:Number = 0; i<1; i+=(1.0/25.9))
 			{
@@ -59,12 +59,21 @@
 			this.OutputLabel.text = outs;
 			var xOffset:Number=300;
 			var yOffset:Number=100;
+			var maxAbsValue:Number = 0;
+			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
+			{
+				for(var ix:int=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
+				{
+					if(maxAbsValue<Math.abs(currentNetwork.getAllNodes()[iy][ix].value))
+						maxAbsValue=Math.abs(currentNetwork.getAllNodes()[iy][ix].value);
+				}
+			}
 			
 			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
 			{
 				for(var ix:int=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
 				{
-					var fill:int = Math.abs(currentNetwork.getAllNodes()[iy][ix].value*1000.0);
+					var fill:int = Math.abs((currentNetwork.getAllNodes()[iy][ix].value/maxAbsValue)*255.0);
 					this.graphics.beginFill(fill<<16 + fill<<8 + fill<<24 + fill);
 					this.graphics.drawCircle(ix*48+xOffset,iy*64+yOffset,10);
 					this.graphics.endFill();
