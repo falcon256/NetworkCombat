@@ -82,6 +82,11 @@
 			}
 			return newNet;
 		}
+		
+		public function getAllNodes():Array
+		{
+			return this.allNodes;
+		}
 	}
 	
 }
