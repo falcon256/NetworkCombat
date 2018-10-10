@@ -12,6 +12,13 @@
 		private var inputTestString:String =  "TEST@INPUT@@@@@@";
 		private var outputTestString:String = "TEST@OUTPUT@GOOD";
 		private var trainingSpeed:Number = 1;
+		private var posColor:uint = 0x0099FF;
+		private var negColor:uint = 0xFF4444;
+		private var xMulti:int = 48;
+		private var yMulti:int = 64;
+		private var xOffset:Number=300;
+		private var yOffset:Number=100;
+		
 		public function IntroAnimation() 
 		{
 			trace("intro starting");
@@ -57,8 +64,7 @@
 			}
 			this.InputLabel.text = inputTestString;
 			this.OutputLabel.text = outs;
-			var xOffset:Number=300;
-			var yOffset:Number=100;
+			
 			var maxAbsValue:Number = 0;
 			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
 			{
@@ -74,12 +80,43 @@
 				for(var ix:int=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
 				{
 					var fill:int = Math.abs((currentNetwork.getAllNodes()[iy][ix].value/maxAbsValue)*255.0);
-					this.graphics.beginFill(fill<<16 + fill<<8 + fill<<24 + fill);
-					this.graphics.drawCircle(ix*48+xOffset,iy*64+yOffset,10);
+					this.graphics.beginFill(fill<<16 + fill<<8 + fill);
+					this.graphics.drawCircle(ix*xMulti+xOffset,iy*yMulti+yOffset,10);
 					this.graphics.endFill();
+					
 				}
 			}
 			
+			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
+			{
+				for(var ix:int=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
+				{
+					this.graphics.lineStyle(4, posColor, .75);
+					var nx:int = findHighestWeight(currentNetwork.getAllNodes()[iy][ix])
+					this.graphics.moveTo(ix*xMulti+xOffset, iy*yMulti+yOffset);
+					this.graphics.lineTo(nx*xMulti+xOffset, (iy+1)*yMulti+yOffset);
+					this.graphics.lineStyle(4, negColor, .75);
+					nx:int = findLowestWeight(currentNetwork.getAllNodes()[iy][ix])
+					this.graphics.moveTo(ix*xMulti+xOffset, iy*yMulti+yOffset);
+					this.graphics.lineTo(nx*xMulti+xOffset, (iy+1)*yMulti+yOffset);
+				}
+			}
+			drawTrainingSpeedBar(trainingSpeed);
+			drawScoreBar(Math.max(currentNetwork.score,lastNetwork));
+		}
+		
+		private function drawTrainingSpeedBar(num:Number)
+		{
+			this.graphics.lineStyle(xMulti, negColor, 1.0);
+			this.graphics.moveTo(xMulti*currentNetwork.getAllNodes()[0].length+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset);
+			this.graphics.lineTo(xMulti*currentNetwork.getAllNodes()[0].length+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset-num);
+		}
+		
+		private function drawScoreBar(num:Number)
+		{
+			this.graphics.lineStyle(xMulti, posColor, 1.0);
+			this.graphics.moveTo(xMulti*(currentNetwork.getAllNodes()[0].length+1)+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset);
+			this.graphics.lineTo(xMulti*(currentNetwork.getAllNodes()[0].length+1)+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset-num);
 		}
 		
 		private function convertToLetter(number:Number):String
@@ -91,6 +128,36 @@
 		private function convertToNumber(str:String):Number
 		{
 			return (str.charCodeAt(0)-65)/26.0;
+		}
+		
+		private function findLowestWeight(node:Neuron):int
+		{
+			var currentI:int = 0;
+			var currentW:Number = 0;
+			for(var i:int=0; i<node.childWeights.length; i++)
+			{
+				if(node.childWeights[i]<currentW)
+				{
+					currentI=i;
+					currentW=node.childWeights[i];
+				}
+			}
+			return currentI;
+		}
+		
+		private function findHighestWeight(node:Neuron):int
+		{
+			var currentI:int = 0;
+			var currentW:Number = 0;
+			for(var i:int=0; i<node.childWeights.length; i++)
+			{
+				if(node.childWeights[i]>currentW)
+				{
+					currentI=i;
+					currentW=node.childWeights[i];
+				}
+			}
+			return currentI;
 		}
 	}
 	
