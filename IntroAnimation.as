@@ -16,8 +16,9 @@
 		private var negColor:uint = 0xFF4444;
 		private var xMulti:int = 48;
 		private var yMulti:int = 64;
-		private var xOffset:Number=300;
+		private var xOffset:Number=100;
 		private var yOffset:Number=100;
+		private var averageFrameRate:Number = 0;
 		
 		public function IntroAnimation() 
 		{
@@ -36,25 +37,29 @@
 		
 		private function doTick(evt:Event)
 		{
+			averageFrameRate+=stage.frameRate*0.01;
+			averageFrameRate*=0.998;
+			this.graphics.clear(); 
 			var outs:String = "";
-			for(var ticks:int; ticks<100; ticks++)
+			var i:int=0;
+			for(var ticks:int; ticks<averageFrameRate; ticks++)
 			{
 				if(currentNetwork.score>lastNetwork.score)
 					lastNetwork=currentNetwork;
 				
-				currentNetwork = lastNetwork.mutateAndReturnNewNetwork(Math.random()*0.1*trainingSpeed,Math.random()*0.05*trainingSpeed,Math.random()*0.01*trainingSpeed);
+				currentNetwork = lastNetwork.mutateAndReturnNewNetwork(Math.random()*0.001*trainingSpeed*sliderNeuronMutationChance.value,Math.random()*0.0001*trainingSpeed*sliderNeuronWeightDelta.value,Math.random()*0.0001*trainingSpeed*sliderNeuronBiasDelta.value);
 				
-				for(var i:int=0; i<10; i++)
+				for(i = 0; i<16; i++)
 					currentNetwork.setSingleInput(i,convertToNumber(inputTestString.charAt(i)));
 				
 				currentNetwork.tickNetwork();
-				currentNetwork.score=260;
-				trainingSpeed = 0;
+				currentNetwork.score=0;
+				trainingSpeed = sliderNeuronBiasDelta.value+sliderNeuronMutationChance.value+sliderNeuronWeightDelta.value;
 				outs = "";
-				for(var i:int=0; i<10; i++)
+				for(i = 0; i<16; i++)
 				{
-					trainingSpeed += Math.abs(currentNetwork.getSingleOutput(i)-convertToNumber(outputTestString.charAt(i)))
-					currentNetwork.score-=Math.abs(currentNetwork.getSingleOutput(i)-convertToNumber(outputTestString.charAt(i)));
+					//trainingSpeed += Math.abs(currentNetwork.getSingleOutput(i)-convertToNumber(outputTestString.charAt(i)))
+					currentNetwork.score-=Math.abs(currentNetwork.getSingleOutput(i)-(convertToNumber(outputTestString.charAt(i))+0.02))*3.0;
 					if(convertToLetter(currentNetwork.getSingleOutput(i)).match(outputTestString.charAt(i)))
 						currentNetwork.score+=10;
 					outs+=convertToLetter(currentNetwork.getSingleOutput(i));
@@ -62,8 +67,9 @@
 				}
 				//trace(outs);
 			}
-			this.InputLabel.text = inputTestString;
-			this.OutputLabel.text = outs;
+
+			this.InputLabel.text = inputTestString.replace(/@/g, " "); 
+			this.OutputLabel.text = outs.replace(/@/g, " "); 
 			
 			var maxAbsValue:Number = 0;
 			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
@@ -75,9 +81,9 @@
 				}
 			}
 			
-			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
+			for(iy=0; iy <currentNetwork.getAllNodes().length;iy++)
 			{
-				for(var ix:int=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
+				for(ix=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
 				{
 					var fill:int = Math.abs((currentNetwork.getAllNodes()[iy][ix].value/maxAbsValue)*255.0);
 					this.graphics.beginFill(fill<<16 + fill<<8 + fill);
@@ -87,22 +93,22 @@
 				}
 			}
 			
-			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
+			for(iy=0; iy <currentNetwork.getAllNodes().length-1;iy++)
 			{
-				for(var ix:int=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
+				for(ix=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
 				{
 					this.graphics.lineStyle(4, posColor, .75);
 					var nx:int = findHighestWeight(currentNetwork.getAllNodes()[iy][ix])
 					this.graphics.moveTo(ix*xMulti+xOffset, iy*yMulti+yOffset);
 					this.graphics.lineTo(nx*xMulti+xOffset, (iy+1)*yMulti+yOffset);
 					this.graphics.lineStyle(4, negColor, .75);
-					nx:int = findLowestWeight(currentNetwork.getAllNodes()[iy][ix])
+					nx = findLowestWeight(currentNetwork.getAllNodes()[iy][ix])
 					this.graphics.moveTo(ix*xMulti+xOffset, iy*yMulti+yOffset);
 					this.graphics.lineTo(nx*xMulti+xOffset, (iy+1)*yMulti+yOffset);
 				}
 			}
 			drawTrainingSpeedBar(trainingSpeed);
-			drawScoreBar(Math.max(currentNetwork.score,lastNetwork));
+			drawScoreBar(Math.max(currentNetwork.score,lastNetwork.score));
 		}
 		
 		private function drawTrainingSpeedBar(num:Number)
