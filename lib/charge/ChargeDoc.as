@@ -28,8 +28,8 @@
 			removeChild(evt.currentTarget.parent);
 			
 			evt.currentTarget.removeEventListener(MouseEvent.CLICK, startGameHandler);
-			createIntro();
-			//createGame();
+			//createIntro();
+			createGame();
 		}
 		
 		private function createIntro():void

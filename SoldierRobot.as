@@ -3,7 +3,9 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import lib.charge.ChargeGame;
-
+	import lib.DanNN.Network;
+	import lib.DanNN.Neuron;
+	
 	public class SoldierRobot extends MovieClip {
 		
 		public var amIRed:Boolean;

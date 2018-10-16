@@ -3,7 +3,8 @@
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import fl.motion.Color;
-	
+	import lib.DanNN.Network;
+	import lib.DanNN.Neuron;
 	
 	public class IntroAnimation extends MovieClip {
 		

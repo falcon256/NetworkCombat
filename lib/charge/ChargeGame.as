@@ -13,6 +13,8 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.ColorTransform;
+	import lib.DanNN.Network;
+	import lib.DanNN.Neuron;
 	
 	public class ChargeGame extends MovieClip
 	{

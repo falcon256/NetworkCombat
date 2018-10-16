@@ -1,21 +1,15 @@
-﻿package  {
+﻿package lib.DanNN {
 	
 	public class Neuron {
 
-		
-		
-		var isSigmoid:Boolean;
-		var isReLu:Boolean;
-		var isTanh:Boolean;
-	
-		var childNeurons:Array;
-		var childWeights:Array;
-		var childBiases:Array;
-		
-		var isLeaf:Boolean;
-		
-		var value:Number;
-		
+		public var isSigmoid:Boolean;
+		public var isReLu:Boolean;
+		public var isTanh:Boolean;	
+		public var childNeurons:Array;
+		public var childWeights:Array;
+		public var childBiases:Array;		
+		public var isLeaf:Boolean;	
+		public var value:Number;		
 		
 		public function Neuron(children:Array)
 		{

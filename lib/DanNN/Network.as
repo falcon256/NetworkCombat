@@ -1,5 +1,5 @@
-﻿package  {
-	import Neuron;
+﻿package lib.DanNN {
+	import lib.DanNN.Neuron;
 	public class Network {
 
 		private var allNodes:Array;
