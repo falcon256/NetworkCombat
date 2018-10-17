@@ -10,6 +10,7 @@
 		public var velX:Number;
 		public var velY:Number;
 		public var amIRed:Boolean;
+		public var myRobot:SoldierRobot=null;
 		public static var chargeGame:ChargeGame;
 		private static var bulletNum = 0;
 		
@@ -32,6 +33,35 @@
 			velX*=0.999;
 			velY+=0.1;
 			velY*=0.999;
+			var guyN:int;
+			for(guyN=0; guyN < chargeGame.allSoldiers.length; guyN++)
+			{
+				var guy:SoldierRobot = chargeGame.allSoldiers[guyN];
+				if(guy.hitTestPoint(x,y)&&guy.hitTestPoint(x,y,true))
+				{
+					//trace("KILLLLLLLL!~L!L!L!L!L!!L!L!L!L!L!");
+					if(guy.amIRed==myRobot.amIRed)
+					{
+						if(Math.random()>0.9)//friendly fire!
+						{
+							myRobot.brain.score--;
+							guy.health-=101;
+							destroyMe();
+							return;
+						}
+					}
+					else
+					{
+						if(Math.random()>0.5)//unfriendly fire!
+						{
+							myRobot.brain.score++;
+							guy.health-=101;
+							destroyMe();
+							return;
+						}
+					}
+				}
+			}
 		}
 		
 		public function destroyMe()
@@ -41,7 +71,7 @@
 				removeEventListener(Event.ENTER_FRAME, doTick);
 				parent.removeChild(this);
 				bulletNum--;
-				trace("Bullets " + bulletNum);
+				//trace("Bullets " + bulletNum);
 			}
 		}
 		

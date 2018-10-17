@@ -14,13 +14,14 @@
 		public var facingLeft:Boolean;
 		
 		private var direction:Boolean;
-		private var health:Number;
+		public var health:Number;
 		private var stopped:Boolean;
 		private var maxLifeTime:Number;
 		private var age:Number;
 		//public  var allSoldiers:Array;
 		public static var chargeGame:ChargeGame;
 		public var brain:Network;
+		public var scoreBias:Number=0;
 		
 		private var shootCooldown:Number = 0;
 		
@@ -33,6 +34,7 @@
 			startWalk();
 			direction = amIRed = red;
 			amIFalling=true;
+			health = 100;
 		}
 		
 		public function startWalk()
@@ -129,7 +131,7 @@
 			{
 				if(shootCooldown<0)
 				{
-					shootCooldown = 10;
+					shootCooldown = 1;
 					var bullet:Bullet = new Bullet();
 					bullet.x=this.x;
 					bullet.y=this.y;
@@ -138,7 +140,8 @@
 					bullet.width=32;
 					bullet.height=32;
 					bullet.rotation=aimAngle+90;
-					
+					bullet.myRobot = this;
+					bullet.amIRed=this.amIRed;
 					this.parent.addChild(bullet);
 					//trace("Bullet shot! "+bullet.x+" "+bullet.y+" "+bullet.velX+" "+bullet.velY);
 				}
@@ -164,16 +167,20 @@
 				trace(x+" "+y);
 			
 			
-			
+			if(health<0)
+			{
+				trace("Killed by hostile action.");
+				killMeAndSaveMyBrain();
+			}
 		}
 		
 		public function killMeAndSaveMyBrain():void
 		{
 			//trace("Killing...");
-			var score:Number = x;
+			var score:Number = brain.score;
 			if(amIRed)
 			{
-				brain.score=score=chargeGame.getDistanceRatioFromBlueBase(x,y);
+				brain.score=score=chargeGame.getDistanceRatioFromBlueBase(x,y)+scoreBias;
 				chargeGame.addRedNetwork(brain);				
 				this.parent.removeChild(this);				
 				chargeGame.allSoldiers.splice(chargeGame.allSoldiers.indexOf(this),1);
@@ -181,11 +188,12 @@
 			}
 			else
 			{	
-				brain.score=score=chargeGame.getDistanceRatioFromRedBase(x,y);
+				brain.score=score=chargeGame.getDistanceRatioFromRedBase(x,y)+scoreBias;
 				chargeGame.addBlueNetwork(brain);				
 				this.parent.removeChild(this);
 				chargeGame.allSoldiers.splice(chargeGame.allSoldiers.indexOf(this),1);
 			}
+			
 		}
 		
 		public function setDir(newDir:Boolean):void
