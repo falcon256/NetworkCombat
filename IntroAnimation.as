@@ -2,6 +2,8 @@
 	
 	import flash.display.MovieClip;
 	import flash.events.Event;
+	import flash.utils.getTimer;
+	import flash.text.TextFormat;
 	import fl.motion.Color;
 	import lib.DanNN.Network;
 	import lib.DanNN.Neuron;
@@ -19,12 +21,17 @@
 		private var yMulti:int = 64;
 		private var xOffset:Number=100;
 		private var yOffset:Number=100;
-		private var averageFrameRate:Number = 0;
-		
+		private var averageFrameRate:Number = 1;
+		private var startTime:Number=0;
+		private var framesNumber:Number = 0;
+		public function disable()
+		{
+			removeEventListener(Event.ENTER_FRAME, doTick);
+		}
 		public function IntroAnimation() 
 		{
 			trace("intro starting");
-			
+			startTime = getTimer();
 			currentNetwork = new Network(6,16);
 			lastNetwork = new Network(6,16);
 			
@@ -38,7 +45,11 @@
 		
 		private function doTick(evt:Event)
 		{
-			averageFrameRate+=stage.frameRate*0.01;
+			framesNumber++;
+			var currentTime:Number = (getTimer() - startTime) / 1000;
+			var fps:Number = (Math.floor((framesNumber/currentTime)*10.0)/10.0);
+			
+			averageFrameRate+=fps*0.01;
 			averageFrameRate*=0.998;
 			this.graphics.clear(); 
 			var outs:String = "";
@@ -71,8 +82,15 @@
 
 			this.InputLabel.text = inputTestString.replace(/@/g, " "); 
 			this.OutputLabel.text = outs.replace(/@/g, " "); 
-			
+			var myTextFormat:TextFormat = new TextFormat();
+			myTextFormat.size = 20
+			//myTextFormat.color = 0xFFFFFF;
+			//score.PlayerScore.setStyle("textFormat", myTextFormat);
 			var maxAbsValue:Number = 0;
+			myTextFormat.size = 20
+			this.InputLabel.setStyle("textFormat", myTextFormat);
+			this.OutputLabel.setStyle("textFormat", myTextFormat);
+			
 			for(var iy:int=0; iy <currentNetwork.getAllNodes().length;iy++)
 			{
 				for(var ix:int=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
@@ -82,17 +100,19 @@
 				}
 			}
 			
+			
 			for(iy=0; iy <currentNetwork.getAllNodes().length;iy++)
 			{
 				for(ix=0; ix<currentNetwork.getAllNodes()[iy].length;ix++)
 				{
 					var fill:int = Math.abs((currentNetwork.getAllNodes()[iy][ix].value/maxAbsValue)*255.0);
 					this.graphics.beginFill(fill<<16 + fill<<8 + fill);
+					this.graphics.lineStyle(4, posColor, .75);
 					this.graphics.drawCircle(ix*xMulti+xOffset,iy*yMulti+yOffset,10);
 					this.graphics.endFill();
 					
 				}
-			}
+			}	
 			
 			for(iy=0; iy <currentNetwork.getAllNodes().length-1;iy++)
 			{
@@ -108,6 +128,9 @@
 					this.graphics.lineTo(nx*xMulti+xOffset, (iy+1)*yMulti+yOffset);
 				}
 			}
+			
+					
+			
 			drawTrainingSpeedBar(trainingSpeed);
 			drawScoreBar(Math.max(currentNetwork.score,lastNetwork.score));
 		}
@@ -116,14 +139,14 @@
 		{
 			this.graphics.lineStyle(xMulti, negColor, 1.0);
 			this.graphics.moveTo(xMulti*currentNetwork.getAllNodes()[0].length+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset);
-			this.graphics.lineTo(xMulti*currentNetwork.getAllNodes()[0].length+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset-num);
+			this.graphics.lineTo(xMulti*currentNetwork.getAllNodes()[0].length+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset-(num*2.5));
 		}
 		
 		private function drawScoreBar(num:Number)
 		{
 			this.graphics.lineStyle(xMulti, posColor, 1.0);
 			this.graphics.moveTo(xMulti*(currentNetwork.getAllNodes()[0].length+1)+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset);
-			this.graphics.lineTo(xMulti*(currentNetwork.getAllNodes()[0].length+1)+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset-num);
+			this.graphics.lineTo(xMulti*(currentNetwork.getAllNodes()[0].length+1)+xOffset,yMulti*currentNetwork.getAllNodes().length+yOffset-(num*2));
 		}
 		
 		private function convertToLetter(number:Number):String

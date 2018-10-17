@@ -9,7 +9,8 @@
 	public class ChargeDoc extends MovieClip
 	{
 		private var startButton = null;
-		
+		private var startScreen = null;
+		private var intro:IntroAnimation = null;
 		public function ChargeDoc()
 		{
 			stage.scaleMode = StageScaleMode.EXACT_FIT;
@@ -20,31 +21,37 @@
 		private function createStartMenu():void
 		{
 			var startMenu:StartScreen = new StartScreen();
-			
+			startScreen=startMenu;
 			addChild(startMenu);
 			
-			startMenu.startButton.addEventListener(MouseEvent.CLICK, startGameHandler);
+			startMenu.startButton.addEventListener(MouseEvent.CLICK, startIntroHandler);
 		}
 		
 		private function delayedIntro()
-		{
-				
+		{				
 			removeChild(startButton.parent);	
 			createIntro();
 		}
 		
-		private function startGameHandler(evt:MouseEvent):void
+		private function startIntroHandler(evt:MouseEvent):void		
 		{
 			startButton = evt.currentTarget;
-			TweenLite.to(startButton, 1, {onComplete:delayedIntro, alpha:0});
-				
+			TweenLite.to(startScreen, 1, {onComplete:delayedIntro, alpha:0});
 			evt.currentTarget.removeEventListener(MouseEvent.CLICK, startGameHandler);
-			//createGame();
+		}
+		
+		private function startGameHandler(evt:MouseEvent):void
+		{
+			intro.disable();
+			removeChild(intro);
+			intro = null;
+			createGame();
 		}
 		
 		private function createIntro():void
 		{
-			var intro:IntroAnimation = new IntroAnimation();
+			intro = new IntroAnimation();
+			intro.ProceedButton.addEventListener(MouseEvent.CLICK, startGameHandler);
 			addChild(intro);
 		}
 		

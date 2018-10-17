@@ -22,6 +22,8 @@
 		public static var chargeGame:ChargeGame;
 		public var brain:Network;
 		
+		private var shootCooldown:Number = 0;
+		
 		
 		public function SoldierRobot(br:Network,red) {
 			brain = br;
@@ -42,6 +44,7 @@
 		
 		public function update():void
 		{
+			shootCooldown--;
 			if(brain==null)
 			{
 				trace("This guy has no brain!!!!!!");
@@ -60,9 +63,9 @@
 			}
 			}
 			if(facingLeft)
-				this.scaleX=-0.1;
+				this.scaleX=-1.0;
 			else
-				this.scaleX=0.1;
+				this.scaleX=1.0;
 			var isGrounded:Boolean = false;
 			var crouchOffset = (amICrouched)?5:0;
 			if(chargeGame.getColorSample(this.x,this.y+96-crouchOffset))
@@ -124,7 +127,21 @@
 			}
 			else if(shootBias>0.5)
 			{
-				
+				if(shootCooldown<0)
+				{
+					shootCooldown = 10;
+					var bullet:Bullet = new Bullet();
+					bullet.x=this.x;
+					bullet.y=this.y;
+					bullet.velX = -Math.cos(ChargeGame.radFromDeg(aimAngle))*10.0;
+					bullet.velY = -Math.sin(ChargeGame.radFromDeg(aimAngle))*10.0;
+					bullet.width=32;
+					bullet.height=32;
+					bullet.rotation=aimAngle+90;
+					
+					this.parent.addChild(bullet);
+					//trace("Bullet shot! "+bullet.x+" "+bullet.y+" "+bullet.velX+" "+bullet.velY);
+				}
 			}
 			else if(crouchBias>0.5)
 			{
@@ -139,10 +156,12 @@
 				killMeAndSaveMyBrain();
 			
 			
-			if(x<1+width)
-				x=1+width;
-			if(x>chargeGame.stage.width-width)
-				x=chargeGame.stage.width-width;
+			if(x<32)
+				x=32;
+			if(x>1024-32)
+				x=1024-32;
+			if(y>chargeGame.height)
+				trace(x+" "+y);
 			
 			
 			
@@ -174,6 +193,13 @@
 			direction = newDir;
 			gotoAndStop(5);
 		}
+		
+		
+		
+	
 	}
 	
+	
+	
+
 }

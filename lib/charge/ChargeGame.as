@@ -131,8 +131,8 @@
 		{
 			//trace("guy created! " + dir);
 			newGuy.setDir(dir);
-			newGuy.width=10;
-			newGuy.height=16;
+			newGuy.width=12;
+			newGuy.height=18;
 			newGuy.y = blueBase.y + blueBase.height - newGuy.height - 100;
 			var myColorTransform = new ColorTransform();
 			if (dir == false)
@@ -167,9 +167,12 @@
 				guy.update();
 			}
 			//grab our stage for per-pixel collision detection.
-			stageBitmapData = new BitmapData(currentStage.width, currentStage.height);
-			stageBitmapData.draw(currentStage);
-			stageBitmap = new Bitmap(stageBitmapData);
+			if(stageBitmapData==null)
+			{
+				stageBitmapData = new BitmapData(currentStage.width, currentStage.height);
+				stageBitmapData.draw(currentStage);
+				stageBitmap = new Bitmap(stageBitmapData);
+			}
 			
 
 			if (spawnTimerAccumulator++ > spawnTimerMaximum/stage.frameRate)
@@ -219,7 +222,7 @@
 					best=net;
 				}				
 			}
-			trace("Red:"+best.score+" "+redNetworks.length)
+			//trace("Red:"+best.score+" "+redNetworks.length)
 			return best;
 		}
 		
@@ -236,7 +239,7 @@
 					best=net;
 				}				
 			}
-			trace("Blue:"+best.score+" "+blueNetworks.length)
+			//trace("Blue:"+best.score+" "+blueNetworks.length)
 			return best;
 		}
 		
@@ -373,6 +376,18 @@
 				}
 			}
 			return Math.min(near,1.0);
+		}
+				//borrowed
+		public static function degFromRad( p_radInput:Number ):Number
+		{
+			var degOutput:Number = ( 180 / Math.PI ) * p_radInput;
+			return degOutput;
+		}
+
+		public static function radFromDeg( p_degInput:Number ):Number
+		{
+			var radOutput:Number = ( Math.PI / 180 ) * p_degInput;
+			return radOutput;
 		}
 	}
 }
