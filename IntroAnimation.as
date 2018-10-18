@@ -129,7 +129,24 @@
 				}
 			}
 			
-					
+			if(currentNetwork.score>100)
+			{
+				ProceedButton.enabled=true;
+				ProceedButton.icons[0].GewdEnufImage.visible=false;
+				ProceedButton.icons[0].ProceedImage.visible=true;
+			}
+			else if(currentNetwork.score>50)
+			{
+				ProceedButton.enabled=true;
+				ProceedButton.icons[0].GewdEnufImage.visible=true;
+				ProceedButton.icons[0].ProceedImage.visible=false;
+			}
+			else
+			{
+				ProceedButton.enabled=false;
+				ProceedButton.icons[0].GewdEnufImage.visible=false;
+				ProceedButton.icons[0].ProceedImage.visible=false;
+			}
 			
 			drawTrainingSpeedBar(trainingSpeed);
 			drawScoreBar(Math.max(currentNetwork.score,lastNetwork.score));

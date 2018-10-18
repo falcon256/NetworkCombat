@@ -13,6 +13,7 @@
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.ColorTransform;
+	import flash.text.TextFormat;
 	import lib.DanNN.Network;
 	import lib.DanNN.Neuron;
 	
@@ -31,8 +32,8 @@
 		private var guy2Button:SimpleButton;		
 		private var yBuffer:Number;
 		private var xBuffer:Number;		
-		private var blueScore:Number;
-		private var redScore:Number;		
+		public var blueScore:Number;
+		public var redScore:Number;		
 		private var blueField:TextField;
 		private var redField:TextField;		
 		private var stageBitmapData:BitmapData;
@@ -73,21 +74,27 @@
 			guy2Button.x = guyButton.width;
 			
 			addChild(currentStage);
-			addChild(guyButton);
-			addChild(guy2Button);
 			
 			blueScore = 0;
 			redScore = 0;
+			var myTextFormat:TextFormat = new TextFormat();
+			myTextFormat.size = 20
 			
+			
+			
+			myTextFormat.color = 0x00AAFF;
 			blueField = new TextField;
 			blueField.width = 200;
 			blueField.text = "blue Score: 0";
+			blueField.setTextFormat(myTextFormat);
+			
+			myTextFormat.color = 0xFFAA00;
 			redField = new TextField;
 			redField.width = 200;
 			redField.text = "red Score: 0";
-			
-			blueField.x = guyButton.width + guy2Button.width;
-			redField.x = blueField.x + blueField.width;
+			redField.setTextFormat(myTextFormat);
+			blueField.x = 256;
+			redField.x = 768;
 			
 			addChild(blueField);
 			addChild(redField);

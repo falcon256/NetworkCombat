@@ -39,24 +39,35 @@
 				var guy:SoldierRobot = chargeGame.allSoldiers[guyN];
 				if(guy.hitTestPoint(x,y)&&guy.hitTestPoint(x,y,true))
 				{
+					var crouchMulti:Number = 1.0;
+					if(guy.amICrouched)
+						crouchMulti=0.1;
 					//trace("KILLLLLLLL!~L!L!L!L!L!!L!L!L!L!L!");
 					if(guy.amIRed==myRobot.amIRed)
 					{
-						if(Math.random()>0.9)//friendly fire!
+						if(Math.random()<0.1*crouchMulti)//friendly fire!
 						{
 							myRobot.brain.score--;
 							guy.health-=101;
 							destroyMe();
+							if(guy.amIRed)
+								chargeGame.redScore--;
+							else
+								chargeGame.blueScore--;
 							return;
 						}
 					}
 					else
 					{
-						if(Math.random()>0.5)//unfriendly fire!
+						if(Math.random()<0.5*crouchMulti)//unfriendly fire!
 						{
 							myRobot.brain.score++;
 							guy.health-=101;
 							destroyMe();
+							if(guy.amIRed)
+								chargeGame.redScore++;
+							else
+								chargeGame.blueScore++;
 							return;
 						}
 					}
