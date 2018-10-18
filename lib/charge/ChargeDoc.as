@@ -52,6 +52,7 @@
 		{
 			intro = new IntroAnimation();
 			intro.ProceedButton.addEventListener(MouseEvent.CLICK, startGameHandler);
+			intro.GewdEnufButton.addEventListener(MouseEvent.CLICK, startGameHandler);
 			addChild(intro);
 		}
 		

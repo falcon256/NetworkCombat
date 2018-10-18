@@ -78,7 +78,7 @@
 			blueScore = 0;
 			redScore = 0;
 			var myTextFormat:TextFormat = new TextFormat();
-			myTextFormat.size = 20
+			myTextFormat.size = 20;
 			
 			
 			
@@ -163,8 +163,26 @@
 			currentStage.playingField.addChild(newGuy);
 		}
 		
+		private function updateScores()
+		{
+			var myTextFormat:TextFormat = new TextFormat();
+			myTextFormat.size = 20;
+			
+			blueField.width = 200;
+			redField.width = 200;
+			blueField.x = 256;
+			redField.x = 768;
+			blueField.text = "Blue Score: "+blueScore;
+			redField.text = "Red Score: "+redScore;
+			myTextFormat.color = 0x00AAFF;
+			blueField.setTextFormat(myTextFormat);
+			myTextFormat.color = 0xFFAA00;
+			redField.setTextFormat(myTextFormat);
+		}
+		
 		private function update(evt:Event):void
 		{
+			updateScores();
 			currentMaxLifeTime = Math.min(maxLifeTime,currentMaxLifeTime+0.1);
 			spawnTimerAccumulator++;
 			var guy:SoldierRobot;
@@ -185,7 +203,12 @@
 			if (spawnTimerAccumulator++ > spawnTimerMaximum/stage.frameRate)
 			{
 				spawnTimerAccumulator=0;
-				createGuy(false, new SoldierRobot(getBestBlueNetwork().mutateAndReturnNewNetwork(0.5,0.01,0.01),false));
+				
+				var a:Number = currentStage.Slider1.value;
+				var b:Number = currentStage.Slider2.value;
+				var c:Number = currentStage.Slider3.value;
+				
+				createGuy(false, new SoldierRobot(getBestBlueNetwork().mutateAndReturnNewNetwork(0.25*a,0.005*b,0.005*c),false));
 				createGuy(true, new SoldierRobot(getBestRedNetwork().mutateAndReturnNewNetwork(0.5,0.1,0.1),true));
 				trace(currentStage.playingField.numChildren);
 			}
@@ -384,6 +407,25 @@
 			}
 			return Math.min(near,1.0);
 		}
+		
+		public function getEnemiesNearbyClose(xa:Number, red:Boolean):Number
+		{
+			var near:Number=0;
+			var guy:SoldierRobot;
+			for each (guy in allSoldiers)
+			{
+				if(guy.amIRed!=red)
+				{
+					var xd:Number = Math.abs(guy.x-xa)
+					if( xd < 64 )
+					{
+						near+=0.1;
+					}
+				}
+			}
+			return Math.min(near,1.0);
+		}
+		
 				//borrowed
 		public static function degFromRad( p_radInput:Number ):Number
 		{

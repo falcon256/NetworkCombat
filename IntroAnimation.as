@@ -129,23 +129,26 @@
 				}
 			}
 			
-			if(currentNetwork.score>100)
+			if(Math.max(currentNetwork.score,lastNetwork.score)>160)
 			{
 				ProceedButton.enabled=true;
-				ProceedButton.icons[0].GewdEnufImage.visible=false;
-				ProceedButton.icons[0].ProceedImage.visible=true;
+				ProceedButton.visible=true;
+				GewdEnufButton.enabled=false;
+				GewdEnufButton.visible=false;
 			}
-			else if(currentNetwork.score>50)
+			else if(Math.max(currentNetwork.score,lastNetwork.score)>50)
 			{
-				ProceedButton.enabled=true;
-				ProceedButton.icons[0].GewdEnufImage.visible=true;
-				ProceedButton.icons[0].ProceedImage.visible=false;
+				ProceedButton.enabled=false;
+				ProceedButton.visible=false;
+				GewdEnufButton.enabled=true;
+				GewdEnufButton.visible=true;
 			}
 			else
 			{
 				ProceedButton.enabled=false;
-				ProceedButton.icons[0].GewdEnufImage.visible=false;
-				ProceedButton.icons[0].ProceedImage.visible=false;
+				ProceedButton.visible=false;
+				GewdEnufButton.enabled=false;
+				GewdEnufButton.visible=false;
 			}
 			
 			drawTrainingSpeedBar(trainingSpeed);

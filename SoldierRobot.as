@@ -93,6 +93,9 @@
 			brain.setSingleInput(1,chargeGame.getAlliesNearbyClose(x,amIRed));
 			brain.setSingleInput(2,chargeGame.getAlliesNearby(x,amIRed));
 			brain.setSingleInput(3,chargeGame.getAlliesNearbyFar(x,amIRed));
+			brain.setSingleInput(4,chargeGame.getEnemiesNearbyClose(x,amIRed));
+			brain.setSingleInput(5,chargeGame.getDistanceRatioFromBlueBase(x,y));
+			brain.setSingleInput(6,chargeGame.getDistanceRatioFromRedBase(x,y));
 			brain.tickNetwork();
 			var leftBias:Number = brain.getSingleOutput(0);
 			var rightBias:Number = brain.getSingleOutput(1);
@@ -131,7 +134,7 @@
 			{
 				if(shootCooldown<0)
 				{
-					shootCooldown = 1;
+					shootCooldown = 10;
 					var bullet:Bullet = new Bullet();
 					bullet.x=this.x;
 					bullet.y=this.y;
