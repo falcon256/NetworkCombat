@@ -24,8 +24,6 @@
 		private var spawnTimerAccumulator:Number;
 		private var spawnTimerMaximum:Number;
 		
-		private var guyButton:SimpleButton;
-		private var guy2Button:SimpleButton;		
 		private var yBuffer:Number;
 		private var xBuffer:Number;		
 		public var blueScore:Number;
@@ -58,16 +56,11 @@
 			allSoldiers = new Array();
 			blueNetworks = new Array();
 			redNetworks = new Array();
-			
-			//debug code
+
 			blueNetworks.push(new Network(2,10));
 			redNetworks.push(new Network(2,10));
 			
 			currentStage = new Stage1();
-			guyButton = new Guy1Button();
-			guy2Button = new Guy2Button();
-			
-			guy2Button.x = guyButton.width;
 			
 			addChild(currentStage);
 			
@@ -410,7 +403,7 @@
 			return Math.min(near,1.0);
 		}
 		
-				//borrowed
+		//borrowed
 		public static function degFromRad( p_radInput:Number ):Number
 		{
 			var degOutput:Number = ( 180 / Math.PI ) * p_radInput;
