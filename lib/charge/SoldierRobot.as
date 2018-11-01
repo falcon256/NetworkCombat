@@ -1,8 +1,7 @@
-﻿package  {
+﻿package lib.charge {
 	
 	import flash.display.MovieClip;
 	import flash.events.Event;
-	import lib.charge.ChargeGame;
 	import lib.DanNN.Network;
 	import lib.DanNN.Neuron;
 	
@@ -18,8 +17,7 @@
 		private var stopped:Boolean;
 		private var maxLifeTime:Number;
 		private var age:Number;
-		//public  var allSoldiers:Array;
-		public static var chargeGame:ChargeGame;
+		public static var sChargeGame:ChargeGame;
 		public var brain:Network;
 		public var scoreBias:Number=0;
 		
@@ -29,8 +27,7 @@
 		public function SoldierRobot(br:Network,red) {
 			brain = br;
 			age = 0;
-			maxLifeTime = chargeGame.currentMaxLifeTime;
-			//allSoldiers = new Array();
+			maxLifeTime = sChargeGame.currentMaxLifeTime;
 			startWalk();
 			direction = amIRed = red;
 			amIFalling=true;
@@ -70,7 +67,7 @@
 				this.scaleX=1.0;
 			var isGrounded:Boolean = false;
 			var crouchOffset = (amICrouched)?5:0;
-			if(chargeGame.getColorSample(this.x,this.y+96-crouchOffset))
+			if(sChargeGame.getColorSample(this.x,this.y+96-crouchOffset))
 			{
 				y--;
 				isGrounded=true;
@@ -80,7 +77,7 @@
 			{
 				y++;
 				isGrounded=false;
-				if(chargeGame.getColorSample(this.x,this.y+97-crouchOffset))
+				if(sChargeGame.getColorSample(this.x,this.y+97-crouchOffset))
 				{
 					amIFalling=true;
 				}
@@ -90,12 +87,12 @@
 			
 			
 			brain.setSingleInput(0,(isGrounded)?1:0);
-			brain.setSingleInput(1,chargeGame.getAlliesNearbyClose(x,amIRed));
-			brain.setSingleInput(2,chargeGame.getAlliesNearby(x,amIRed));
-			brain.setSingleInput(3,chargeGame.getAlliesNearbyFar(x,amIRed));
-			brain.setSingleInput(4,chargeGame.getEnemiesNearbyClose(x,amIRed));
-			brain.setSingleInput(5,chargeGame.getDistanceRatioFromBlueBase(x,y));
-			brain.setSingleInput(6,chargeGame.getDistanceRatioFromRedBase(x,y));
+			brain.setSingleInput(1,sChargeGame.getAlliesNearbyClose(x,amIRed));
+			brain.setSingleInput(2,sChargeGame.getAlliesNearby(x,amIRed));
+			brain.setSingleInput(3,sChargeGame.getAlliesNearbyFar(x,amIRed));
+			brain.setSingleInput(4,sChargeGame.getEnemiesNearbyClose(x,amIRed));
+			brain.setSingleInput(5,sChargeGame.getDistanceRatioFromBlueBase(x,y));
+			brain.setSingleInput(6,sChargeGame.getDistanceRatioFromRedBase(x,y));
 			brain.tickNetwork();
 			var leftBias:Number = brain.getSingleOutput(0);
 			var rightBias:Number = brain.getSingleOutput(1);
@@ -114,7 +111,7 @@
 			{
 				if(isGrounded)
 				{
-					x+=0.5;
+					x+=0.6;
 					Leg1.play();
 					Leg2.play();
 				}
@@ -124,7 +121,7 @@
 			{
 				if(isGrounded)
 				{
-					x-=0.5;
+					x-=0.6;
 					Leg1.play();
 					Leg2.play();
 				}
@@ -158,7 +155,7 @@
 			}
 			this.Gun.rotation = aimAngle;
 			//trace(age+" "+maxLifeTime);
-			if(age++>maxLifeTime||y>chargeGame.stage.height)
+			if(age++>maxLifeTime||y>sChargeGame.stage.height)
 				killMeAndSaveMyBrain();
 			
 			
@@ -166,7 +163,7 @@
 				x=32;
 			if(x>1024-32)
 				x=1024-32;
-			if(y>chargeGame.height)
+			if(y>sChargeGame.height)
 				trace(x+" "+y);
 			
 			
@@ -183,18 +180,18 @@
 			var score:Number = brain.score;
 			if(amIRed)
 			{
-				brain.score=score=chargeGame.getDistanceRatioFromBlueBase(x,y)+scoreBias;
-				chargeGame.addRedNetwork(brain);				
+				brain.score=score=sChargeGame.getDistanceRatioFromBlueBase(x,y)+scoreBias;
+				sChargeGame.addRedNetwork(brain);				
 				this.parent.removeChild(this);				
-				chargeGame.allSoldiers.splice(chargeGame.allSoldiers.indexOf(this),1);
+				sChargeGame.allSoldiers.splice(sChargeGame.allSoldiers.indexOf(this),1);
 				
 			}
 			else
 			{	
-				brain.score=score=chargeGame.getDistanceRatioFromRedBase(x,y)+scoreBias;
-				chargeGame.addBlueNetwork(brain);				
+				brain.score=score=sChargeGame.getDistanceRatioFromRedBase(x,y)+scoreBias;
+				sChargeGame.addBlueNetwork(brain);				
 				this.parent.removeChild(this);
-				chargeGame.allSoldiers.splice(chargeGame.allSoldiers.indexOf(this),1);
+				sChargeGame.allSoldiers.splice(sChargeGame.allSoldiers.indexOf(this),1);
 			}
 			
 		}

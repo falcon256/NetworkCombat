@@ -1,10 +1,6 @@
 ﻿package lib.charge
 {
 	
-		//TODO-BUG- Troubleshoot why the spawn point changes on the red side.
-	
-	
-	
 	import flash.display.MovieClip;
 	import flash.display.SimpleButton;
 	import flash.events.MouseEvent;
@@ -55,7 +51,7 @@
 			spawnTimerMaximum = 1000;
 			yBuffer = 100;
 			xBuffer = 30;
-			maxLifeTime=1000000;
+			maxLifeTime=10000000;
 			currentMaxLifeTime=1000;
 			
 			
@@ -99,9 +95,6 @@
 			addChild(blueField);
 			addChild(redField);
 			
-			guyButton.addEventListener(MouseEvent.CLICK, createGuyHandler);
-			guy2Button.addEventListener(MouseEvent.CLICK, createGuy2Handler);
-			
 			blueBase = new Castle();
 			redBase = new Castle();
 			
@@ -120,18 +113,8 @@
 			
 			currentStage.playingField.addChild(blueBase);
 			currentStage.playingField.addChild(redBase);
-			SoldierRobot.chargeGame=this;
+			SoldierRobot.sChargeGame=this;
 			addEventListener(Event.ENTER_FRAME, update);
-		}
-		
-		private function createGuyHandler(evt:MouseEvent):void
-		{
-			//createGuy(true, new SoldierRobot());
-		}
-		
-		private function createGuy2Handler(evt:MouseEvent):void
-		{
-			//createGuy(true, new SoldierRobot());
 		}
 		
 		private function createGuy(dir:Boolean, newGuy:SoldierRobot):void
@@ -183,7 +166,7 @@
 		private function update(evt:Event):void
 		{
 			updateScores();
-			currentMaxLifeTime = Math.min(maxLifeTime,currentMaxLifeTime+0.1);
+			currentMaxLifeTime = Math.min(maxLifeTime,currentMaxLifeTime+0.2);
 			spawnTimerAccumulator++;
 			var guy:SoldierRobot;
 			for each (guy in allSoldiers)
@@ -191,12 +174,17 @@
 				guy.visible=false;
 				guy.update();
 			}
+
 			//grab our stage for per-pixel collision detection.
-			if(stageBitmapData==null)
+			if(stageBitmapData==null&&currentStage!=null&&currentStage.playingField!=null&&currentStage.Stage1BG!=null)
 			{
+				currentStage.Stage1BG.visible=false;
+				currentStage.Stage1BG.enabled=false;
 				stageBitmapData = new BitmapData(currentStage.width, currentStage.height);
 				stageBitmapData.draw(currentStage);
 				stageBitmap = new Bitmap(stageBitmapData);
+				currentStage.Stage1BG.visible=true;
+				currentStage.Stage1BG.enabled=true;
 			}
 			
 
@@ -325,15 +313,11 @@
 		public function  getDistanceRatioFromBlueBase(xa:Number, ya:Number):Number
 		{
 			return stage.width-Math.abs(xa-blueBase.x);
-			//var xd:Number = Math.abs(xa-blueBase.x);
-			//return xd/stage.width;
 		}
 		
 		public function  getDistanceRatioFromRedBase(xa:Number, ya:Number):Number
 		{
 			return stage.width-Math.abs(xa-redBase.x);
-			//var xd:Number = Math.abs(xa-redBase.x);
-			//return xd/stage.width;
 		}
 		
 		private function pause():void

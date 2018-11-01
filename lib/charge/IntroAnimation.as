@@ -1,4 +1,4 @@
-﻿package  {
+﻿package lib.charge {
 	
 	import flash.display.MovieClip;
 	import flash.events.Event;

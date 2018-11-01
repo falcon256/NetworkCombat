@@ -1,4 +1,4 @@
-﻿package  {
+﻿package lib.charge {
 	
 	import flash.display.MovieClip;
 	import lib.charge.ChargeGame;
@@ -33,11 +33,18 @@
 			velX*=0.999;
 			velY+=0.1;
 			velY*=0.999;
+			
+			if(chargeGame.getColorSample(this.x,this.y+80))
+			{
+				destroyMe();
+				return;
+			}
+			
 			var guyN:int;
 			for(guyN=0; guyN < chargeGame.allSoldiers.length; guyN++)
 			{
 				var guy:SoldierRobot = chargeGame.allSoldiers[guyN];
-				if(guy.hitTestPoint(x,y)&&guy.hitTestPoint(x,y,true))
+				if(guy.hitTestPoint(x,y+96)&&guy.hitTestPoint(x,y+96,true))
 				{
 					var crouchMulti:Number = 1.0;
 					if(guy.amICrouched)
