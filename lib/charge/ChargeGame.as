@@ -181,7 +181,7 @@
 			}
 			
 
-			if (spawnTimerAccumulator++ > spawnTimerMaximum/stage.frameRate)
+			if (spawnTimerAccumulator++ > (3*spawnTimerMaximum)/stage.frameRate)
 			{
 				spawnTimerAccumulator=0;
 				
