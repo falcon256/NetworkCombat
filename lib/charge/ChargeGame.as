@@ -57,8 +57,8 @@
 			blueNetworks = new Array();
 			redNetworks = new Array();
 
-			blueNetworks.push(new Network(2,10));
-			redNetworks.push(new Network(2,10));
+			blueNetworks.push(new Network(3,10));
+			redNetworks.push(new Network(3,10));
 			
 			currentStage = new Stage1();
 			

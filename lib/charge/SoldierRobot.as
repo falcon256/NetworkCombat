@@ -131,7 +131,7 @@
 			{
 				if(shootCooldown<0)
 				{
-					shootCooldown = 10;
+					shootCooldown = 5;
 					var bullet:Bullet = new Bullet();
 					bullet.x=this.x;
 					bullet.y=this.y;
